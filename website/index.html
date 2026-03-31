@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suraksha — Delhi Safety Network</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="shortcut icon" href="fev.png" type="image/fevi.png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fdf4ff;
+      color: #1a1a2e;
+    }
+
+    :root {
+      --grad: linear-gradient(135deg, #2563EB 0%, #7c3aed 40%, #db2777 80%, #f472b6 100%);
+      --grad2: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+      --primary: #7c3aed;
+      --blue: #2563EB;
+      --pink: #db2777;
+      --light-pink: #fdf2f8;
+      --light-blue: #eff6ff;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --muted: #64748b;
+    }
+
+    /* NAV */
+    nav {
+      background: var(--grad);
+      padding: 16px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 20px rgba(124, 58, 237, 0.3);
+    }
+
+    .nav-logo {
+      color: #fff;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    .nav-logo span {
+      color: #fbcfe8;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-links a {
+      color: #e9d5ff;
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .nav-btn {
+      background: #fff;
+      color: #7c3aed;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    /* HERO */
+    .hero {
+      background: var(--grad);
+      color: #fff;
+      padding: 100px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      top: -150px;
+      right: -100px;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      bottom: -100px;
+      left: -50px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fce7f3;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .hero h1 {
+      font-size: 52px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .hero h1 span {
+      color: #fbcfe8;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: #e9d5ff;
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 60px;
+    }
+
+    .btn-white {
+      background: #fff;
+      color: #7c3aed;
+      padding: 14px 32px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 15px;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-outline {
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      color: #fff;
+      padding: 14px 32px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+    }
+
+    /* PHONE MOCKUP */
+    .phone-mockup {
+      display: inline-block;
+      background: #1a1a2e;
+      border-radius: 40px;
+      padding: 12px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      width: 200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .phone-screen {
+      background: #fdf4ff;
+      border-radius: 30px;
+      padding: 20px 16px;
+      text-align: center;
+    }
+
+    .phone-header {
+      background: var(--grad);
+      color: #fff;
+      border-radius: 12px;
+      padding: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .phone-sos {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #db2777, #f472b6);
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 800;
+      box-shadow: 0 4px 15px rgba(219, 39, 119, 0.4);
+    }
+
+    .phone-status {
+      font-size: 10px;
+      color: #639922;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .phone-tabs {
+      display: flex;
+      justify-content: space-around;
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 4px;
+    }
+
+    .phone-tab {
+      font-size: 9px;
+      color: #64748b;
+      text-align: center;
+    }
+
+    .phone-tab.active {
+      color: #7c3aed;
+      font-weight: 600;
+    }
+
+    /* TICKER */
+    .ticker {
+      background: #1e1b4b;
+      color: #fff;
+      padding: 10px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-inner {
+      display: inline-block;
+      animation: ticker 35s linear infinite;
+    }
+
+    .ticker-item {
+      display: inline-block;
+      padding: 0 40px;
+      font-size: 13px;
+    }
+
+    .ticker-dot {
+      color: #f472b6;
+      margin-right: 8px;
+    }
+
+    @keyframes ticker {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    /* STATS */
+    .stats {
+      display: flex;
+      justify-content: center;
+      background: #fff;
+      flex-wrap: wrap;
+      border-bottom: 0.5px solid #f3e8ff;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 30px 40px;
+      border-right: 0.5px solid #f3e8ff;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .stat:last-child {
+      border-right: none;
+    }
+
+    .stat-num {
+      font-size: 36px;
+      font-weight: 800;
+      background: var(--grad2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* HOW IT WORKS */
+    .how-section {
+      background: #fff;
+      padding: 80px 40px;
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .how-card {
+      text-align: center;
+      padding: 32px 20px;
+    }
+
+    .how-num {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--grad);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .how-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #1a1a2e;
+    }
+
+    .how-desc {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    /* SECTIONS */
+    .section-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #1a1a2e;
+    }
+
+    .section-sub {
+      font-size: 15px;
+      color: #64748b;
+      margin-bottom: 32px;
+    }
+
+    .section-white {
+      background: #fff;
+      padding: 60px 40px;
+    }
+
+    .section-gray {
+      background: #fdf4ff;
+      padding: 60px 40px;
+    }
+
+    .inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* FEATURES */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid #f3e8ff;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.1);
+    }
+
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .feature-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #1a1a2e;
+    }
+
+    .feature-desc {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    /* APP SCREENSHOTS */
+    .screenshots {
+      background: var(--grad);
+      padding: 80px 40px;
+      color: #fff;
+    }
+
+    .screenshots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: 40px auto 0;
+    }
+
+    .screenshot-card {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .screenshot-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    .screenshot-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .screenshot-desc {
+      font-size: 11px;
+      color: #fce7f3;
+    }
+
+    /* MAP */
+    #delhi-map {
+      height: 500px;
+      border-radius: 16px;
+      border: 1px solid #f3e8ff;
+      margin-bottom: 20px;
+    }
+
+    .map-legend {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .map-filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 8px 20px;
+      border-radius: 20px;
+      border: 1px solid #f3e8ff;
+      background: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active {
+      background: var(--grad);
+      color: #fff;
+      border-color: #7c3aed;
+    }
+
+    /* HEATMAP */
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-top: 20px;
+    }
+
+    .heatmap-cell {
+      height: 40px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .heatmap-cell:hover {
+      transform: scale(1.1);
+    }
+
+    .heatmap-labels {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .heatmap-label {
+      text-align: center;
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .time-filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .time-btn {
+      padding: 6px 16px;
+      border-radius: 16px;
+      border: 1px solid #f3e8ff;
+      background: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .time-btn.active {
+      background: var(--grad);
+      color: #fff;
+      border-color: #7c3aed;
+    }
+
+    /* NEWS */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .news-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px;
+      border: 1px solid #f3e8ff;
+      border-left: 4px solid #7c3aed;
+    }
+
+    .news-area {
+      font-size: 11px;
+      font-weight: 600;
+      color: #7c3aed;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .news-title {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      line-height: 1.4;
+      color: #1a1a2e;
+    }
+
+    .news-meta {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .news-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .badge-red {
+      background: #fdf2f8;
+      color: #9d174d;
+    }
+
+    .badge-amber {
+      background: #FAEEDA;
+      color: #854F0B;
+    }
+
+    .badge-blue {
+      background: #f3e8ff;
+      color: #6d28d9;
+    }
+
+    /* SAFE ROUTE */
+    .route-form {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid #f3e8ff;
+      max-width: 600px;
+      margin: 0 auto 24px;
+    }
+
+    .route-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #f3e8ff;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-bottom: 12px;
+      font-family: inherit;
+      color: #1a1a2e;
+      background: #fdf4ff;
+    }
+
+    .route-btn {
+      width: 100%;
+      background: var(--grad);
+      color: #fff;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .route-result {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid #f3e8ff;
+      max-width: 600px;
+      margin: 0 auto;
+      display: none;
+    }
+
+    .route-step {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 0.5px solid #fdf4ff;
+      align-items: flex-start;
+    }
+
+    .route-step:last-child {
+      border-bottom: none;
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--grad);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.5;
+    }
+
+    .step-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    /* POLICE */
+    .police-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .police-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px;
+      border: 1px solid #f3e8ff;
+    }
+
+    .police-name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #1a1a2e;
+    }
+
+    .police-area {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+
+    .police-num {
+      font-size: 18px;
+      font-weight: 700;
+      color: #7c3aed;
+      margin-bottom: 10px;
+    }
+
+    .call-btn {
+      display: inline-block;
+      background: var(--grad);
+      color: #fff;
+      padding: 6px 16px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* NGO */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .dash-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid #f3e8ff;
+    }
+
+    .dash-num {
+      font-size: 32px;
+      font-weight: 800;
+      background: var(--grad2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .dash-label {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .download-btn {
+      display: inline-block;
+      background: var(--grad);
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      border: none;
+    }
+
+    /* FORUM */
+    .forum-posts {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .forum-post {
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px;
+      border: 1px solid #f3e8ff;
+    }
+
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .post-user {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .post-time {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .post-area {
+      font-size: 11px;
+      color: #7c3aed;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .post-text {
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .post-action {
+      font-size: 12px;
+      color: #94a3b8;
+      cursor: pointer;
+    }
+
+    .post-action:hover {
+      color: #db2777;
+    }
+
+    .forum-input-area {
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px;
+      border: 1px solid #f3e8ff;
+      margin-bottom: 16px;
+    }
+
+    .forum-textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #f3e8ff;
+      border-radius: 10px;
+      font-size: 13px;
+      height: 80px;
+      resize: none;
+      font-family: inherit;
+      margin-bottom: 10px;
+      background: #fdf4ff;
+    }
+
+    .forum-post-btn {
+      background: var(--grad);
+      color: #fff;
+      padding: 8px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* REPORT */
+    .report-form {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 28px;
+      border-radius: 16px;
+      border: 1px solid #f3e8ff;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #334155;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #f3e8ff;
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fdf4ff;
+      color: #1a1a2e;
+      font-family: inherit;
+    }
+
+    .form-group textarea {
+      height: 100px;
+      resize: none;
+    }
+
+    .rating-stars {
+      display: flex;
+      gap: 8px;
+    }
+
+    .star {
+      font-size: 28px;
+      cursor: pointer;
+      color: #f3e8ff;
+      transition: color 0.1s;
+    }
+
+    .star.active {
+      color: #db2777;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: var(--grad);
+      color: #fff;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    /* TEAM */
+    .team-section {
+      background: #fff;
+      padding: 80px 40px;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .team-card {
+      text-align: center;
+      padding: 28px 20px;
+      background: #fdf4ff;
+      border-radius: 16px;
+      border: 1px solid #f3e8ff;
+    }
+
+    .team-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--grad);
+      color: #fff;
+      font-size: 22px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+    }
+
+    .team-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 4px;
+    }
+
+    .team-role {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    /* HELPLINES */
+    .helplines {
+      background: var(--grad);
+      padding: 60px 40px;
+      color: #fff;
+    }
+
+    .helplines-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .helpline-card {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .helpline-num {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .helpline-name {
+      font-size: 12px;
+      color: #fce7f3;
+      margin-bottom: 12px;
+    }
+
+    .helpline-btn {
+      display: inline-block;
+      background: #fff;
+      color: #7c3aed;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    footer {
+      background: #0f0a1e;
+      color: #475569;
+      text-align: center;
+      padding: 32px;
+      font-size: 13px;
+    }
+
+    footer span {
+      background: var(--grad2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: #475569;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    .footer-links a:hover {
+      color: #f472b6;
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 30px;
+      }
+
+      nav {
+        padding: 16px 20px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .section-white,
+      .section-gray {
+        padding: 40px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="nav-logo">SURA<span>KSHA</span></div>
+    <div class="nav-links">
+      <a href="#map">Map</a>
+      <a href="#heatmap">Heatmap</a>
+      <a href="#news">News</a>
+      <a href="#route">Safe Route</a>
+      <a href="#police">Police</a>
+      <a href="#forum">Forum</a>
+      <a href="#report">Report</a>
+      <a href="#helplines">Helplines</a>
+    </div>
+    <a href="#" class="nav-btn">Download App</a>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-badge">Built for Delhi — by Delhiites</div>
+    <h1>Stay Safe in <span>Delhi</span><br />With Your Community</h1>
+    <p>Real-time safety map, community reviews, instant SOS and Friend Zone — the only safety app built specifically for
+      every Delhiite.</p>
+    <div class="hero-btns">
+      <a href="#" class="btn-white">Download App — Free</a>
+      <a href="#map" class="btn-outline">View Safety Map</a>
+    </div>
+    <div class="phone-mockup">
+      <div class="phone-screen">
+        <div class="phone-header">SURAKSHA</div>
+        <div class="phone-sos">SOS</div>
+        <div class="phone-status">● You are safe</div>
+        <div class="phone-tabs">
+          <div class="phone-tab active">Home</div>
+          <div class="phone-tab">Map</div>
+          <div class="phone-tab">Friends</div>
+          <div class="phone-tab">Settings</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="ticker-item"><span class="ticker-dot">●</span>Rohini Sector 9 — 3 incidents reported this week</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>Connaught Place — Marked safe by 45 users today</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>Uttam Nagar — Avoid after 7pm, multiple reports</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>Saket — Security increased near mall area</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>Chandni Chowk — Caution advised after 9pm</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>Hauz Khas — Popular area, safe till 11pm</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>Rohini Sector 9 — 3 incidents reported this week</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>Connaught Place — Marked safe by 45 users today</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>Uttam Nagar — Avoid after 7pm, multiple reports</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>Saket — Security increased near mall area</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>Chandni Chowk — Caution advised after 9pm</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>Hauz Khas — Popular area, safe till 11pm</span>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num" id="s1">0</div>
+      <div class="stat-label">Areas Mapped</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="s2">0</div>
+      <div class="stat-label">Police Stations</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="s3">0</div>
+      <div class="stat-label">Community Reviews</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="s4">0</div>
+      <div class="stat-label">SOS Alerts Sent</div>
+    </div>
+  </div>
+
+  <div class="how-section">
+    <div class="inner" style="text-align:center">
+      <div class="section-title" style="text-align:center">How it works</div>
+      <div class="section-sub" style="text-align:center">Three simple steps to stay safe anywhere in Delhi</div>
+      <div class="how-grid">
+        <div class="how-card">
+          <div class="how-num">1</div>
+          <div class="how-title">Download and setup</div>
+          <div class="how-desc">Add your 3 emergency contacts, choose your SOS gesture, and enable Friend Zone with
+            people you trust.</div>
+        </div>
+        <div class="how-card">
+          <div class="how-num">2</div>
+          <div class="how-title">Stay informed</div>
+          <div class="how-desc">Check the Delhi safety map before going out. See which areas are red, amber or green
+            right now.</div>
+        </div>
+        <div class="how-card">
+          <div class="how-num">3</div>
+          <div class="how-title">One gesture saves you</div>
+          <div class="how-desc">Power button x3 or volume hold — location sent, camera records silently, friends alerted
+            instantly.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-gray">
+    <div class="inner">
+      <div class="section-title">Everything you need to stay safe</div>
+      <div class="section-sub">Not just another safety app — a complete Delhi safety ecosystem</div>
+      <div class="features">
+        <div class="feature-card">
+          <div class="feature-icon">🆘</div>
+          <div class="feature-title">One press SOS</div>
+          <div class="feature-desc">Power button x3 or volume gesture. Works with screen off and locked. Location sent
+            in seconds.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📍</div>
+          <div class="feature-title">4-method location</div>
+          <div class="feature-desc">GPS, WiFi, cell tower, IP address — works even when location is turned off on your
+            phone.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">👥</div>
+          <div class="feature-title">Friend Zone</div>
+          <div class="feature-desc">Friends with the app get live full-screen alerts, see your location, confirm your
+            safety remotely.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🗺️</div>
+          <div class="feature-title">Delhi safety map</div>
+          <div class="feature-desc">Red, amber, green zones from real community reports — time-aware, updates every
+            hour.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📹</div>
+          <div class="feature-title">Silent recording</div>
+          <div class="feature-desc">Front and rear camera records silently. Uploads in 2-min chunks — video safe even if
+            phone grabbed.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔐</div>
+          <div class="feature-title">Duress PIN</div>
+          <div class="feature-desc">A secret PIN that looks normal but silently triggers SOS in background. No other
+            free app has this.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⏱️</div>
+          <div class="feature-title">Safe walk timer</div>
+          <div class="feature-desc">Set a timer before going out — if you don't check in, SOS triggers automatically.
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <div class="feature-title">Fake call screen</div>
+          <div class="feature-desc">Press decline on a fake incoming call — secretly triggers SOS. Looks completely
+            normal.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤝</div>
+          <div class="feature-title">Daily check-in</div>
+          <div class="feature-desc">Silent daily ping to your friend circle — no action needed, they know you're okay.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screenshots">
+    <div class="inner" style="text-align:center">
+      <div style="font-size:28px;font-weight:700;margin-bottom:8px;">Inside the app</div>
+      <div style="font-size:15px;color:#fce7f3;margin-bottom:0">Everything you need in 4 simple screens</div>
+      <div class="screenshots-grid">
+        <div class="screenshot-card">
+          <div class="screenshot-icon">🔴</div>
+          <div class="screenshot-title">Home — SOS</div>
+          <div class="screenshot-desc">Big SOS button, status indicator, quick access to police and hospital</div>
+        </div>
+        <div class="screenshot-card">
+          <div class="screenshot-icon">🗺️</div>
+          <div class="screenshot-title">Safety Map</div>
+          <div class="screenshot-desc">Delhi areas color coded — tap any area for reviews and safety score</div>
+        </div>
+        <div class="screenshot-card">
+          <div class="screenshot-icon">👥</div>
+          <div class="screenshot-title">Friend Zone</div>
+          <div class="screenshot-desc">See friends status, get alerted when they need help, confirm safety</div>
+        </div>
+        <div class="screenshot-card">
+          <div class="screenshot-icon">⚙️</div>
+          <div class="screenshot-title">Settings</div>
+          <div class="screenshot-desc">Choose gesture, set duress PIN, enable fake call, safe walk timer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-gray" id="map">
+    <div class="inner">
+      <div class="section-title">Delhi Safety Map</div>
+      <div class="section-sub">Live community data — click any area for details</div>
+      <div class="map-legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#639922"></div>Safe
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#BA7517"></div>Caution
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#E24B4A"></div>Avoid
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#7c3aed"></div>Police Station
+        </div>
+      </div>
+      <div id="delhi-map"></div>
+    </div>
+  </div>
+
+  <div class="section-white" id="heatmap">
+    <div class="inner">
+      <div class="section-title">Crime Heatmap by Time</div>
+      <div class="section-sub">See when each day of the week is most unsafe</div>
+      <div class="time-filters">
+        <button class="time-btn active" onclick="setHeatmap('week',this)">This Week</button>
+        <button class="time-btn" onclick="setHeatmap('month',this)">This Month</button>
+        <button class="time-btn" onclick="setHeatmap('year',this)">This Year</button>
+      </div>
+      <div class="heatmap-labels">
+        <div class="heatmap-label">Mon</div>
+        <div class="heatmap-label">Tue</div>
+        <div class="heatmap-label">Wed</div>
+        <div class="heatmap-label">Thu</div>
+        <div class="heatmap-label">Fri</div>
+        <div class="heatmap-label">Sat</div>
+        <div class="heatmap-label">Sun</div>
+      </div>
+      <div class="heatmap-grid" id="heatmapGrid"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:16px;font-size:12px;color:#64748b">
+        <span>Low</span>
+        <div style="width:16px;height:16px;border-radius:4px;background:#f3e8ff"></div>
+        <div style="width:16px;height:16px;border-radius:4px;background:#e9d5ff"></div>
+        <div style="width:16px;height:16px;border-radius:4px;background:#db2777;opacity:0.5"></div>
+        <div style="width:16px;height:16px;border-radius:4px;background:#db2777"></div>
+        <div style="width:16px;height:16px;border-radius:4px;background:#9d174d"></div>
+        <span>High</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-gray" id="news">
+    <div class="inner">
+      <div class="section-title">Delhi Incident Tracker</div>
+      <div class="section-sub">Auto-plotted from Delhi news sources — updated daily</div>
+      <div class="news-grid">
+        <div class="news-card">
+          <div class="news-area">Rohini</div>
+          <div class="news-title">Snatching incident reported near Sector 9 metro — police deployed</div>
+          <div class="news-meta">2 hours ago <span class="news-badge badge-red">High Risk</span></div>
+        </div>
+        <div class="news-card">
+          <div class="news-area">Uttam Nagar</div>
+          <div class="news-title">Street lights repaired on main road after multiple complaints</div>
+          <div class="news-meta">5 hours ago <span class="news-badge badge-blue">Update</span></div>
+        </div>
+        <div class="news-card">
+          <div class="news-area">Chandni Chowk</div>
+          <div class="news-title">PCR van patrol increased in Old Delhi after evening incidents</div>
+          <div class="news-meta">Yesterday <span class="news-badge badge-amber">Caution</span></div>
+        </div>
+        <div class="news-card">
+          <div class="news-area">Lajpat Nagar</div>
+          <div class="news-title">Eve teasing complaint filed near metro exit — accused arrested</div>
+          <div class="news-meta">Yesterday <span class="news-badge badge-red">Incident</span></div>
+        </div>
+        <div class="news-card">
+          <div class="news-area">Dwarka</div>
+          <div class="news-title">New CCTV cameras installed across Sector 7 and Sector 10</div>
+          <div class="news-meta">2 days ago <span class="news-badge" style="background:#EAF3DE;color:#3B6D11">Good
+              News</span></div>
+        </div>
+        <div class="news-card">
+          <div class="news-area">Shahdara</div>
+          <div class="news-title">Multiple chain snatching reports — police ask residents to be alert</div>
+          <div class="news-meta">2 days ago <span class="news-badge badge-red">High Risk</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-white" id="route">
+    <div class="inner">
+      <div class="section-title" style="text-align:center">Safe Route Planner</div>
+      <div class="section-sub" style="text-align:center">AI suggests the safest path based on time of day and community
+        reports</div>
+      <div class="route-form">
+        <input class="route-input" id="routeFrom" placeholder="From — e.g. Lajpat Nagar Metro" />
+        <input class="route-input" id="routeTo" placeholder="To — e.g. Connaught Place" />
+        <select class="route-input" id="routeTime">
+          <option>Now</option>
+          <option>Morning (6am - 10am)</option>
+          <option>Afternoon (10am - 5pm)</option>
+          <option>Evening (5pm - 9pm)</option>
+          <option>Night (9pm - 12am)</option>
+          <option>Late night (12am+)</option>
+        </select>
+        <button class="route-btn" onclick="planRoute()">Find Safest Route</button>
+      </div>
+      <div class="route-result" id="routeResult">
+        <div style="font-size:15px;font-weight:600;margin-bottom:16px;">Recommended Safe Route</div>
+        <div class="route-step">
+          <div class="step-num">1</div>
+          <div class="step-text">Start at <strong id="r-from"></strong> — well lit, safe to begin<br><span
+              class="step-tag" style="background:#EAF3DE;color:#3B6D11">Safe zone</span></div>
+        </div>
+        <div class="route-step">
+          <div class="step-num">2</div>
+          <div class="step-text">Take main road via Ring Road — avoid inner lanes after 9pm<br><span class="step-tag"
+              style="background:#FAEEDA;color:#854F0B">Stay on main road</span></div>
+        </div>
+        <div class="route-step">
+          <div class="step-num">3</div>
+          <div class="step-text">Pass through Nehru Place — busy, CCTV present<br><span class="step-tag"
+              style="background:#EAF3DE;color:#3B6D11">Safe zone</span></div>
+        </div>
+        <div class="route-step">
+          <div class="step-num">4</div>
+          <div class="step-text">Arrive at <strong id="r-to"></strong> — well patrolled, police post nearby<br><span
+              class="step-tag" style="background:#EAF3DE;color:#3B6D11">Safe destination</span></div>
+        </div>
+        <div style="margin-top:16px;padding:12px;background:#fdf4ff;border-radius:10px;font-size:13px;color:#475569">
+          Safety score: <strong style="color:#7c3aed">8.2 / 10</strong> — Recommended for <span id="r-time"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-gray" id="police">
+    <div class="inner">
+      <div class="section-title">Delhi Police Stations</div>
+      <div class="section-sub">All Delhi police stations — one tap to call</div>
+      <div class="police-grid">
+        <div class="police-card">
+          <div class="police-name">Connaught Place PS</div>
+          <div class="police-area">New Delhi District</div>
+          <div class="police-num">011-23341610</div><a href="tel:01123341610" class="call-btn">Call Now</a>
+        </div>
+        <div class="police-card">
+          <div class="police-name">Lajpat Nagar PS</div>
+          <div class="police-area">South Delhi District</div>
+          <div class="police-num">011-29834636</div><a href="tel:01129834636" class="call-btn">Call Now</a>
+        </div>
+        <div class="police-card">
+          <div class="police-name">Rohini PS</div>
+          <div class="police-area">North West District</div>
+          <div class="police-num">011-27556290</div><a href="tel:01127556290" class="call-btn">Call Now</a>
+        </div>
+        <div class="police-card">
+          <div class="police-name">Karol Bagh PS</div>
+          <div class="police-area">Central District</div>
+          <div class="police-num">011-28752737</div><a href="tel:01128752737" class="call-btn">Call Now</a>
+        </div>
+        <div class="police-card">
+          <div class="police-name">Dwarka PS</div>
+          <div class="police-area">South West District</div>
+          <div class="police-num">011-25361960</div><a href="tel:01125361960" class="call-btn">Call Now</a>
+        </div>
+        <div class="police-card">
+          <div class="police-name">Shahdara PS</div>
+          <div class="police-area">East District</div>
+          <div class="police-num">011-22324444</div><a href="tel:01122324444" class="call-btn">Call Now</a>
+        </div>
+        <div class="police-card">
+          <div class="police-name">Uttam Nagar PS</div>
+          <div class="police-area">West District</div>
+          <div class="police-num">011-25374730</div><a href="tel:01125374730" class="call-btn">Call Now</a>
+        </div>
+        <div class="police-card">
+          <div class="police-name">Saket PS</div>
+          <div class="police-area">South District</div>
+          <div class="police-num">011-29561560</div><a href="tel:01129561560" class="call-btn">Call Now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-white" id="ngo">
+    <div class="inner">
+      <div class="section-title">NGO Dashboard</div>
+      <div class="section-sub">Download Delhi safety data for research and awareness campaigns</div>
+      <div class="dashboard-grid">
+        <div class="dash-card">
+          <div class="dash-num">1,247</div>
+          <div class="dash-label">Total Incidents This Month</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-num">342</div>
+          <div class="dash-label">Verified Reports</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-num">89</div>
+          <div class="dash-label">Red Zone Areas</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-num">156</div>
+          <div class="dash-label">Community Reviews Today</div>
+        </div>
+      </div>
+      <button class="download-btn" onclick="alert('Downloading Delhi Safety Report March 2026...')">Download Monthly
+        Report (PDF)</button>
+      <button class="download-btn" onclick="alert('Downloading area data as CSV...')">Download Area Data (CSV)</button>
+      <button class="download-btn" onclick="alert('Downloading incident log...')">Download Incident Log (CSV)</button>
+    </div>
+  </div>
+
+  <div class="section-gray" id="forum">
+    <div class="inner">
+      <div class="section-title">Community Forum</div>
+      <div class="section-sub">Share safety tips and experiences — anonymous by default</div>
+      <div class="forum-input-area">
+        <textarea class="forum-textarea" id="forumText"
+          placeholder="Share a safety tip or experience for your area..."></textarea>
+        <select
+          style="padding:8px 12px;border:1px solid #f3e8ff;border-radius:8px;font-size:13px;margin-right:10px;margin-bottom:10px;background:#fdf4ff;">
+          <option>Select area</option>
+          <option>Connaught Place</option>
+          <option>Lajpat Nagar</option>
+          <option>Rohini</option>
+          <option>Karol Bagh</option>
+          <option>Dwarka</option>
+          <option>Saket</option>
+          <option>Hauz Khas</option>
+          <option>Chandni Chowk</option>
+        </select>
+        <button class="forum-post-btn" onclick="postForum()">Post Anonymously</button>
+      </div>
+      <div class="forum-posts" id="forumPosts"></div>
+    </div>
+  </div>
+
+  <div class="section-white" id="report">
+    <div class="inner">
+      <div class="section-title" style="text-align:center">Report an Incident</div>
+      <div class="section-sub" style="text-align:center">Help keep Delhi safer — all reports are completely anonymous
+      </div>
+      <div class="report-form">
+        <div class="form-group"><label>Area / Location</label><input type="text"
+            placeholder="e.g. Lajpat Nagar Metro Exit, Gate 2" /></div>
+        <div class="form-group"><label>Safety Rating</label>
+          <div class="rating-stars"><span class="star" onclick="rate(1)">★</span><span class="star"
+              onclick="rate(2)">★</span><span class="star" onclick="rate(3)">★</span><span class="star"
+              onclick="rate(4)">★</span><span class="star" onclick="rate(5)">★</span></div>
+        </div>
+        <div class="form-group"><label>What happened?</label><select>
+            <option>Select incident type</option>
+            <option>Felt unsafe / watched</option>
+            <option>Eve teasing / harassment</option>
+            <option>Snatching / theft</option>
+            <option>Poor lighting</option>
+            <option>Drunk / aggressive people</option>
+            <option>Isolated area</option>
+            <option>Other</option>
+          </select></div>
+        <div class="form-group"><label>Time of incident</label><input type="time" /></div>
+        <div class="form-group"><label>Description (optional)</label><textarea
+            placeholder="Any additional details that could help others..."></textarea></div>
+        <button class="submit-btn" onclick="submitReport()">Submit Anonymously</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="team-section">
+    <div class="inner" style="text-align:center">
+      <div class="section-title" style="text-align:center">Built by Delhiites</div>
+      <div class="section-sub" style="text-align:center">Students from Delhi who got tired of feeling unsafe — so we
+        built the solution</div>
+      <div class="team-grid"
+        style="display:flex; justify-content:center; align-items:center; max-width:900px; margin:0 auto;">
+        <div class="team-card" style="max-width:280px; width:100%;">
+          <div class="team-avatar">A</div>
+          <div class="team-name">Made by Aman and Team</div>
+          <div class="team-role">Frontend, Backend, APIs and Features</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="helplines" id="helplines">
+    <div style="text-align:center;max-width:1100px;margin:0 auto 40px;">
+      <div style="font-size:28px;font-weight:700;margin-bottom:8px;">Delhi Emergency Helplines</div>
+      <div style="font-size:15px;color:#fce7f3;">One tap to call — available 24/7</div>
+    </div>
+    <div class="helplines-grid">
+      <div class="helpline-card">
+        <div class="helpline-num">112</div>
+        <div class="helpline-name">Delhi Police Emergency</div><a href="tel:112" class="helpline-btn">Call Now</a>
+      </div>
+      <div class="helpline-card">
+        <div class="helpline-num">1091</div>
+        <div class="helpline-name">Women Helpline</div><a href="tel:1091" class="helpline-btn">Call Now</a>
+      </div>
+      <div class="helpline-card">
+        <div class="helpline-num">102</div>
+        <div class="helpline-name">Ambulance</div><a href="tel:102" class="helpline-btn">Call Now</a>
+      </div>
+      <div class="helpline-card">
+        <div class="helpline-num">1096</div>
+        <div class="helpline-name">Anti Stalking</div><a href="tel:1096" class="helpline-btn">Call Now</a>
+      </div>
+      <div class="helpline-card">
+        <div class="helpline-num">181</div>
+        <div class="helpline-name">Delhi Govt Helpline</div><a href="tel:181" class="helpline-btn">Call Now</a>
+      </div>
+      <div class="helpline-card">
+        <div class="helpline-num">1099</div>
+        <div class="helpline-name">PCR Van Delhi</div><a href="tel:1099" class="helpline-btn">Call Now</a>
+      </div>
+      <div class="helpline-card">
+        <div class="helpline-num">1098</div>
+        <div class="helpline-name">Childline</div><a href="tel:1098" class="helpline-btn">Call Now</a>
+      </div>
+      <div class="helpline-card">
+        <div class="helpline-num">011-23490360</div>
+        <div class="helpline-name">Delhi Police HQ</div><a href="tel:01123490360" class="helpline-btn">Call Now</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-links">
+      <a href="#map">Safety Map</a>
+      <a href="#route">Safe Route</a>
+      <a href="#report">Report Incident</a>
+      <a href="#helplines">Helplines</a>
+      <a href="#ngo">NGO Dashboard</a>
+    </div>
+    Built with ❤️ for Delhi — <span>Suraksha</span> Safety Network 2026
+  </footer>
+
+  <script>
+    function countUp(id, target, suffix = '') {
+      let count = 0;
+      const step = Math.ceil(target / 60);
+      const timer = setInterval(() => {
+        count = Math.min(count + step, target);
+        document.getElementById(id).textContent = count + suffix;
+        if (count >= target) clearInterval(timer);
+      }, 30);
+    }
+    countUp('s1', 200, '+');
+    countUp('s2', 112);
+    countUp('s3', 4800, '+');
+    countUp('s4', 1247);
+
+    const map = L.map('delhi-map').setView([28.6139, 77.2090], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+
+    const areas = [
+      { name: 'Connaught Place', lat: 28.6315, lng: 77.2167, zone: 'green', reviews: 45, time: 'Safe till 11pm' },
+      { name: 'Lajpat Nagar', lat: 28.5700, lng: 77.2430, zone: 'amber', reviews: 23, time: 'Caution after 9pm' },
+      { name: 'Rohini Sector 9', lat: 28.7041, lng: 77.1025, zone: 'red', reviews: 12, time: 'Avoid after 8pm' },
+      { name: 'Karol Bagh', lat: 28.6520, lng: 77.1908, zone: 'green', reviews: 38, time: 'Safe till 10pm' },
+      { name: 'Dwarka Sector 7', lat: 28.5921, lng: 77.0460, zone: 'amber', reviews: 19, time: 'Caution after 10pm' },
+      { name: 'Chandni Chowk', lat: 28.6562, lng: 77.2310, zone: 'amber', reviews: 31, time: 'Caution after 9pm' },
+      { name: 'Saket', lat: 28.5244, lng: 77.2066, zone: 'green', reviews: 52, time: 'Safe till midnight' },
+      { name: 'Uttam Nagar', lat: 28.6210, lng: 77.0580, zone: 'red', reviews: 8, time: 'Avoid after 7pm' },
+      { name: 'Hauz Khas', lat: 28.5494, lng: 77.2001, zone: 'green', reviews: 41, time: 'Safe till 11pm' },
+      { name: 'Shahdara', lat: 28.6736, lng: 77.2887, zone: 'red', reviews: 15, time: 'Avoid after 8pm' },
+      { name: 'Vasant Kunj', lat: 28.5200, lng: 77.1578, zone: 'green', reviews: 29, time: 'Safe till 11pm' },
+      { name: 'Paharganj', lat: 28.6448, lng: 77.2167, zone: 'amber', reviews: 34, time: 'Caution after 10pm' },
+    ];
+
+    const zoneColors = { green: '#639922', amber: '#BA7517', red: '#E24B4A' };
+    areas.forEach(area => {
+      L.circleMarker([area.lat, area.lng], {
+        radius: 20, fillColor: zoneColors[area.zone], color: zoneColors[area.zone],
+        weight: 1, opacity: 0.8, fillOpacity: 0.4
+      }).addTo(map).bindPopup(`<strong>${area.name}</strong><br>${area.time}<br><small>${area.reviews} reviews</small>`);
+    });
+
+    [{ name: 'CP PS', lat: 28.6330, lng: 77.2195 }, { name: 'Lajpat Nagar PS', lat: 28.5680, lng: 77.2390 }, { name: 'Rohini PS', lat: 28.7060, lng: 77.1050 }, { name: 'Karol Bagh PS', lat: 28.6500, lng: 77.1880 }].forEach(ps => {
+      L.circleMarker([ps.lat, ps.lng], { radius: 8, fillColor: '#7c3aed', color: '#7c3aed', weight: 1, opacity: 1, fillOpacity: 0.9 }).addTo(map).bindPopup(`<strong>${ps.name}</strong><br><a href="tel:112">Call 112</a>`);
+    });
+
+    const heatData = {
+      week: [2, 1, 3, 5, 8, 9, 4, 1, 2, 2, 4, 7, 8, 3, 3, 1, 4, 6, 9, 7, 2],
+      month: [5, 4, 6, 8, 12, 14, 7, 3, 5, 5, 9, 11, 13, 6, 6, 3, 7, 10, 14, 12, 4],
+      year: [20, 15, 25, 35, 48, 52, 28, 12, 18, 20, 38, 45, 50, 24, 22, 12, 28, 42, 55, 48, 18],
+    };
+    function renderHeatmap(data) {
+      const max = Math.max(...data);
+      const colors = ['#f3e8ff', '#e9d5ff', '#db277788', '#db2777', '#9d174d'];
+      const textColors = ['#6d28d9', '#6d28d9', '#fff', '#fff', '#fff'];
+      document.getElementById('heatmapGrid').innerHTML = data.map(val => {
+        const i = Math.floor((val / max) * 4);
+        return `<div class="heatmap-cell" style="background:${colors[i]};color:${textColors[i]}" title="${val} incidents">${val}</div>`;
+      }).join('');
+    }
+    function setHeatmap(period, btn) {
+      document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderHeatmap(heatData[period]);
+    }
+    renderHeatmap(heatData.week);
+
+    function planRoute() {
+      const from = document.getElementById('routeFrom').value;
+      const to = document.getElementById('routeTo').value;
+      const time = document.getElementById('routeTime').value;
+      if (!from || !to) { alert('Please enter both locations!'); return; }
+      document.getElementById('r-from').textContent = from;
+      document.getElementById('r-to').textContent = to;
+      document.getElementById('r-time').textContent = time;
+      const result = document.getElementById('routeResult');
+      result.style.display = 'block';
+      result.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    const forumData = [
+      { area: 'Lajpat Nagar', time: '2 hours ago', text: 'The metro exit on Gate 3 side is very dark at night. Avoid it after 9pm, use Gate 1 instead — much better lighting and security guard present.', likes: 24 },
+      { area: 'Connaught Place', time: '5 hours ago', text: 'CP is generally safe but the inner circle lanes near Palika Bazaar get sketchy after 10pm. Stick to the outer circle with shops open.', likes: 18 },
+      { area: 'Rohini', time: 'Yesterday', text: 'Sector 9 has had multiple snatching incidents this week near the park area. Please be careful and avoid walking alone there after sunset.', likes: 41 },
+      { area: 'Saket', time: '2 days ago', text: 'Select Citywalk area is very safe till midnight. Security guards everywhere and good CCTV coverage. Good meeting point for late evenings.', likes: 15 },
+    ];
+    function renderForum() {
+      document.getElementById('forumPosts').innerHTML = forumData.map((post, i) => `
+      <div class="forum-post">
+        <div class="post-header"><div class="post-user">Anonymous</div><div class="post-time">${post.time}</div></div>
+        <div class="post-area">${post.area}</div>
+        <div class="post-text">${post.text}</div>
+        <div class="post-actions">
+          <span class="post-action" onclick="likePost(${i})">👍 Helpful (${post.likes})</span>
+          <span class="post-action">💬 Reply</span>
+          <span class="post-action">🚩 Report</span>
+        </div>
+      </div>`).join('');
+    }
+    function likePost(i) { forumData[i].likes++; renderForum(); }
+    function postForum() {
+      const text = document.getElementById('forumText').value;
+      if (!text) { alert('Please write something!'); return; }
+      forumData.unshift({ area: 'Your area', time: 'Just now', text, likes: 0 });
+      document.getElementById('forumText').value = '';
+      renderForum();
+    }
+    renderForum();
+
+    function rate(n) { document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('active', i < n)); }
+    function submitReport() { alert('Report submitted anonymously! Thank you for keeping Delhi safer. 🙏'); }
+  </script>
+</body>
+
+</html>
